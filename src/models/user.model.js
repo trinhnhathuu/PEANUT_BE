@@ -5,17 +5,10 @@ const DOCUMENT_NAME = 'User';
 const COLLECTION_NAME = 'Users';
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema({
-    // id: {
-    //     type: Number,
-    //     required: true,
-    //     unique: true,
-    //     index: true,
-    //     autoIncrement: true
-    // },
     role: {
-        type: String,
-        enum: [process.env.ROLE_USER, process.env.ROLE_DOCTOR],
-        default: process.env.ROLE_USER},
+        type: Array,
+        default:[]
+    },
     name: {
         type: String,
         required: true,
@@ -39,23 +32,29 @@ var userSchema = new mongoose.Schema({
         maxLength: 20,
         trim: true
     },
+    address: {
+        type: String,
+        maxLength: 255,
+        trim: true
+    },
     avatar: {
         type: String,
         maxLength: 255,
         trim: true
     },
-    created_at: {
-        type: Date,
-        default: Date.now
+    status: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'inactive'
     },
-    updated_at: {
-        type: Date,
-        default: Date.now
+    verified: {
+        type: Boolean,
+        default: false
     }
 },
     {
-        timestamps: true,
-        collection: COLLECTION_NAME
+        collection: COLLECTION_NAME,
+        timestamps: true
     }
 );
 
