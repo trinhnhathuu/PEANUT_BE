@@ -6,6 +6,8 @@ const crypto = require('crypto');
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
+const {BadRequestError, ConflictRequestError,AuthFailureError } = require("../core/error.response");
+const { findByEmail } = require("./user.service");
 const RoleP = {
     
 ROLE_USER : "190c8c60af4c47018037af98e4fca537",
@@ -13,15 +15,61 @@ ROLE_DOCTOR : "71151aad9a9b4975a8a68e48f80b0707"
 }
 
 class AccessService{
+    /**
+     * 
+     * @param {*} param0 
+     * 1 check email in dbs
+     * 2 match password
+     * 3 create AT và RT ( AT là token, RT là refresh token) và lưu
+     * 4 generate tokens
+     * 5 get data return login
+     * 
+     */
+    static logout = async ({ keyStore }) => {
+        const delKey = await KeyTokenService.removeKeyById({ userId: keyStore._id })
+        console.log('delKey', { delKey })
+        return delKey
+    }
+
+    static login = async({email, password, refreshToken = null})=>{
+        const foundUser = await findByEmail({email})
+        console.log('foundUser', foundUser)
+        //1
+        if (!foundUser) {
+            throw new BadRequestError('Error: Email không tồn tại');
+        }
+        //2
+        // kiếm tra xem password co trung voi trong csdl khong
+        if (!password) throw new BadRequestError('Error: Password rong 01');
+       
+        if(!foundUser.password) throw new BadRequestError('Error: Password rong 02');
+
+        const match = bcrypt.compare(password, foundUser.password);
+        if (!match) throw new AuthFailureError('Authentication failed');
+        ///3 tạo tokens
+        const publickey = crypto.randomBytes(64).toString('hex')
+        const privateKey = crypto.randomBytes(64).toString('hex')
+        const {_id: userId} = foundUser
+        const tokens = await createTokenPair({ user_id: userId, email }, publickey, privateKey);
+        await KeyTokenService.createKeyToken({
+            userId: userId,
+            refreshToken: tokens.refreshToken,
+            publicKey: publickey,
+            privateKey: privateKey,
+        })
+        return {
+
+                user:getInfoData({ fields: ['_id', 'name', 'email'], object: foundUser }),
+                tokens
+        }
+
+    }
     static signUp = async ({name, email, password})=>{
-        try {
+        // try {
             // step : check sự tồn tại của email
             const holderlUser = await userModel.findOne({ email }).lean();
             if (holderlUser) {
-                return {
-                    code:'xxx',
-                    message: 'Email đã đăng ký',
-               }
+                throw new BadRequestError('Error: Email đã được đăng ký');
             }
             const passWordHash = await bcrypt.hash(password, 10);
             const newUser = await userModel.create({ name, email, password: passWordHash, role: RoleP.ROLE_USER });
@@ -64,7 +112,7 @@ class AccessService{
                 return {
                     code: 201,
                     metadata: {
-                        user:getInfoData({ fileds: ['_id', 'name', 'email'], object: newUser }),
+                        user:getInfoData({ fields: ['_id', 'name', 'email'], object: newUser }),
                         tokens
                     }
                 }
@@ -74,14 +122,14 @@ class AccessService{
                 code: 200,
                 metadata: null
             }
-        } catch (err) {
-            return{
-                code: 'xxx02',
-                message: err.message,
-                status:'error'
-            } 
+        // } catch (err) {
+        //     return{
+        //         code: 'xxx02',
+        //         message: err.message,
+        //         status:'error'
+        //     } 
 
-        }
+        // }
         
     }
 

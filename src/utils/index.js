@@ -1,10 +1,10 @@
 'use strict'
 const _ = require('lodash')
 const getInfoData = ({
-    fileds = [],
+    fields = [],
     object = {},
 }) => {
-    return _.pick(object, fileds)
+    return _.pick(object, fields)
 }
 
 module.exports = {
