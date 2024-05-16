@@ -4,10 +4,10 @@ const userModel = require("../models/user.model")
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const KeyTokenService = require("./keyToken.service");
-const { createTokenPair } = require("../auth/authUtils");
+const { createTokenPair, verifyJWT } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
-const {BadRequestError, ConflictRequestError,AuthFailureError } = require("../core/error.response");
 const { findByEmail } = require("./user.service");
+const {BadRequestError, ForbiddenError, AuthFailureError} = require("../core/error.response");
 const RoleP = {
     
 ROLE_USER : "190c8c60af4c47018037af98e4fca537",
@@ -15,6 +15,55 @@ ROLE_DOCTOR : "71151aad9a9b4975a8a68e48f80b0707"
 }
 
 class AccessService{
+    // check this token used
+    static handlerRefreshToken = async ({ refreshToken }) => {
+        const foundToken = await KeyTokenService.findByRefreshTokened(refreshToken)
+        if (foundToken) {
+            // decode token là ai
+            console.log('1ss',{ refreshToken })
+        const { userId, email } = await verifyJWT(refreshToken, foundToken.privateKey)
+            console.log('1st',{ userId, email })
+            // console.log({ userId, email })
+            // xóa token 
+            await KeyTokenService.deleteKeyById(userId)
+            throw new ForbiddenError('Error:something wrong happend ')
+        }
+        // chưa có resfreshToken
+        const holderToken = await KeyTokenService.findByRefreshToken(refreshToken)
+
+        if (!holderToken) {
+            throw new AuthFailureError('Error: Token không tồn tại')
+        }
+        // verify token
+        const { userId, email } = await verifyJWT(refreshToken, holderToken.privateKey)
+        
+
+        console.log('2ss',{ userId, email })
+
+        // check used id
+        const foundUser = await findByEmail({email})
+        if (!foundUser) {
+            throw new AuthFailureError('Error: Email không tồn tại')
+        }
+        // create 1 cặp mới
+        const tokens = await createTokenPair({ user_id: userId, email }, holderToken.publicKey, holderToken.privateKey);
+
+        // update token
+
+        // không sử dụng update mà dùng updateOne
+        await holderToken.updateOne({
+            $set: {
+                refreshToken: tokens.refreshToken,
+            },
+            $addToSet: {
+                refreshTokenUsed: tokens.refreshToken
+            }
+        });
+        return {
+            user: { userId, email },
+            tokens
+        }
+    }
     /**
      * 
      * @param {*} param0 
@@ -58,8 +107,7 @@ class AccessService{
             privateKey: privateKey,
         })
         return {
-
-                user:getInfoData({ fields: ['_id', 'name', 'email'], object: foundUser }),
+                user:getInfoData({ fields: ['_id', 'name', 'email','role'], object: foundUser }),
                 tokens
         }
 

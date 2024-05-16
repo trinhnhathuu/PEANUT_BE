@@ -29,7 +29,7 @@ var userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        maxLength: 20,
+        maxLength: 10,
         trim: true
     },
     address: {
@@ -42,15 +42,25 @@ var userSchema = new mongoose.Schema({
         maxLength: 255,
         trim: true
     },
+    birthday: {
+        type: String
+    },
+    tokenDevice: {
+        type: Array,
+        default: []
+    },
     status: {
         type: String,
         enum: ['active', 'inactive'],
         default: 'inactive'
     },
+    gender: {
+        type:String,
+    },
     verified: {
         type: Boolean,
         default: false
-    }
+    },
 },
     {
         collection: COLLECTION_NAME,
