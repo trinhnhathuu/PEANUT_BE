@@ -33,6 +33,12 @@ class AppointmentController {
         const appointment = await AppointmentService.updateAppointment(id, body)
         res.status(200).json(appointment).send();
     }
+
+    getAllAppointment = async (req, res, next) => {
+        const posters = await AppointmentService.getAllAppointment()
+        res.status(200).json(posters).send();
+    }
+
 }
 
 module.exports = new AppointmentController()

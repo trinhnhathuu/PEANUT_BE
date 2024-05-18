@@ -31,11 +31,12 @@ var doctorSignUpSchema = new Schema({
         type: String,
         required: true
     },
-    hospitalName: {
-        type: String,
+    idHospital: {
+        type: Schema.Types.ObjectId,
+        ref:'Hospital',
         required: true
     },
-    appointment: {
+    department : {
         type: String,
         required: true
     },

@@ -5,7 +5,6 @@ class HospitalService {
     getHospitals = async () => {
         return await hospital
             .find({})
-            .populate('provinceCode', 'name')
             .sort({ createdAt: -1 })
             .lean()
     }

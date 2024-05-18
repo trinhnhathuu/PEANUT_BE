@@ -15,12 +15,12 @@ const DOCUMENT_NAME = 'Appointment';
 const COLLECTION_NAME = 'Appointments';
 
 var appointmentSchema = new Schema({
-    user_id: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    doctor_id: {
+    doctorId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
     },
@@ -65,7 +65,6 @@ var appointmentSchema = new Schema({
     },
     description: {
         type: String,
-
     }
 
 },{
