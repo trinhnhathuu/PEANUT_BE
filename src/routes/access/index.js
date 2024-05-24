@@ -2,7 +2,6 @@
 
 const express = require('express');
 const accessController = require('../../controllers/access.controller')
-const userController = require('../../controllers/user.controller')
 const router = express.Router();
 const {asyncHandler } = require('../../helper/fileAsyncHandler.hander');
 const {authentication} = require('../../auth/authUtils');

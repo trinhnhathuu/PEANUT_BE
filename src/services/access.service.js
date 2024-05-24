@@ -80,38 +80,42 @@ class AccessService{
         return delKey
     }
 
-    static login = async({email, password, refreshToken = null})=>{
-        const foundUser = await findByEmail({email})
-        console.log('foundUser', foundUser)
+    static login = async({email, password, refreshToken = null}) => {
+        const foundUser = await findByEmail({email});
+        console.log('foundUser', foundUser);
+        
         //1
         if (!foundUser) {
             throw new BadRequestError('Error: Email không tồn tại');
         }
         //2
-        // kiếm tra xem password co trung voi trong csdl khong
-        if (!password) throw new BadRequestError('Error: Password rong 01');
+        // kiểm tra xem password có trùng với trong cơ sở dữ liệu không
+        if (!password) throw new BadRequestError('Error: Password rỗng 01');
        
-        if(!foundUser.password) throw new BadRequestError('Error: Password rong 02');
-
-        const match = bcrypt.compare(password, foundUser.password);
+        if(!foundUser.password) throw new BadRequestError('Error: Password rỗng 02');
+    
+        // Await the bcrypt.compare function
+        const match = await bcrypt.compare(password, foundUser.password);
         if (!match) throw new AuthFailureError('Authentication failed');
-        ///3 tạo tokens
-        const publickey = crypto.randomBytes(64).toString('hex')
-        const privateKey = crypto.randomBytes(64).toString('hex')
-        const {_id: userId} = foundUser
+    
+        //3 tạo tokens
+        const publickey = crypto.randomBytes(64).toString('hex');
+        const privateKey = crypto.randomBytes(64).toString('hex');
+        const {_id: userId} = foundUser;
         const tokens = await createTokenPair({ user_id: userId, email }, publickey, privateKey);
         await KeyTokenService.createKeyToken({
             userId: userId,
             refreshToken: tokens.refreshToken,
             publicKey: publickey,
             privateKey: privateKey,
-        })
+        });
+    
         return {
-                user:getInfoData({ fields: ['_id', 'name', 'email','role'], object: foundUser }),
-                tokens
-        }
-
-    }
+            user: getInfoData({ fields: ['_id', 'name', 'email','role'], object: foundUser }),
+            tokens
+        };
+    };
+    
     static signUp = async ({name, email, password})=>{
         // try {
             // step : check sự tồn tại của email

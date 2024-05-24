@@ -10,9 +10,8 @@ const hospitalSchema = new Schema({
     name: String,
     provinceCode: {
         type:String,
-        // ref: 'Province',
       }
-    // provinceCode: String,
+  ,
 }, {
     collection: COLLECTION_NAME,
     timestamps: true

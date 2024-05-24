@@ -13,11 +13,24 @@ const getDoctorById = async({ doctorId }) => {
 }
 
 const getDoctorByUserId = async({ userId }) => {
-    return await DoctorSignUp.findOne({ userId: new ObjectId(userId) }).lean();
+    return await DoctorSignUp.findOne({ userId: new ObjectId(userId) }).populate('userId').lean();
 }
-
+const getDoctorByHospitalId = async({ idHospital }) => {
+    return await DoctorSignUp.find({ idHospital: new ObjectId(idHospital) }).lean().populate('userId').populate('idHospital');
+}
+const paginate = async (filter, options) => {
+    try {
+      const result = await DoctorSignUp.paginate(filter, options);
+      return result;
+    } catch (error) {
+      console.error('Error in paginate:', error);
+      throw error;
+    }
+  };
 module.exports = {
     getDoctor,
     getDoctorById,
-    getDoctorByUserId
+    getDoctorByUserId,
+    getDoctorByHospitalId,
+    paginate
 }

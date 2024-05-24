@@ -57,6 +57,7 @@ var userSchema = new mongoose.Schema({
     gender: {
         type:String,
     },
+    // xác nhận phải bác sĩ hay không 
     verified: {
         type: Boolean,
         default: false

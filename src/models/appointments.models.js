@@ -22,7 +22,7 @@ var appointmentSchema = new Schema({
     },
     doctorId: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'DangKyBacSi',
     },
     // chọn ngày khám
     date: {
@@ -34,21 +34,24 @@ var appointmentSchema = new Schema({
         type: String,
         required: true
     },
-    // trạng thái cuộc hẹn ('pending', 'confirmed', 'cancelled')
+    // trạng thái cuộc hẹn (1: 'pending', 2: 'confirmed', 3: 'cancelled')
     status: {
         type: String,
+        required: true
     },
     // giới tính 
     gender: {
         type: String,
         required: true
     },
-    provinceCode: {
-        type: String,
+    idProvince: {
+        type: Schema.Types.ObjectId,
+        ref: 'Province',
         required: true
     },
-    hospitalCode: {
-        type: String,
+    idHospital: {
+        type: Schema.Types.ObjectId,
+        ref: 'Hospital',
         required: true
     },
     name: {

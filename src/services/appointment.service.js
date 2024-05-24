@@ -7,12 +7,15 @@ const Appointment = require('../models/appointments.models');
 class AppointmentService {
     create = async (body) => {
         const appointment = new Appointment(body);
-        return await appointment.save();
+        return await appointment.save()
     }
     getAppointmentByUserId = async (userId) => {
         return await Appointment
             .find({ userId:new ObjectId(userId)  })
-            .populate('doctorId', 'userId')
+            .populate('doctorId')
+            .populate('userId')
+            .populate('idHospital')
+            .populate('idProvince')
             .lean()
             .sort({ createdAt: -1 })
         
@@ -27,7 +30,10 @@ class AppointmentService {
     getAppointmentByDoctorId = async (doctorId) => {
         return await Appointment
             .find({ doctorId:new ObjectId(doctorId) })
-            .populate('doctorId', 'userId')
+            .populate('doctorId')
+            .populate('userId')
+            .populate('idHospital')
+            .populate('idProvince')
             .lean()
             .sort({ createdAt: -1 })
     }
@@ -35,12 +41,31 @@ class AppointmentService {
         return await Appointment.updateOne({ _id:new ObjectId(id) }, { $set: body })
     }
     getAllAppointment = async () => {
-        return await Appointment.find({}).populate('doctorId', 'userId')
+        return await Appointment.find({}).populate('doctorId')
+        .populate('userId')
             .sort({ createdAt: -1 })
             .lean()
     }
-    
 
+    paginate = async (filter, options) => {
+        return Appointment.paginate(filter, options);
+      };
+    getAppointmentByUserIdWithPage = async (userId, page, limit) => {
+        try {
+          const appointments = await Appointment.find({ userId: new ObjectId(userId) })
+          .populate('doctorId')
+          .populate('userId')
+          .populate('idHospital')
+          .populate('idProvince')
+          .skip((page - 1) * limit)
+          .limit(limit)
+          .sort({ createdAt: -1 });
+          return appointments;
+        } catch (error) {
+          throw error;
+        }
+      };
+      
 }
 
 module.exports = new AppointmentService()

@@ -10,4 +10,6 @@ router.get('/appointment/user/:userId', asyncHandler(AppointmentController.getAp
 router.get('/appointment/doctor/:doctorId', asyncHandler(AppointmentController.getAppointmentByDoctorId))
 router.get('/appointment/:id', asyncHandler(AppointmentController.getAppointmentById))
 router.put('/appointment/:id', asyncHandler(AppointmentController.updateAppointment))
+
+router.get('/appointment/user/:userId/appointments', asyncHandler(AppointmentController.getAppointmentByUserIdWithPage))
 module.exports = router

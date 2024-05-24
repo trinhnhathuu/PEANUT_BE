@@ -1,7 +1,7 @@
 'use strict'
 const AppointmentService = require('../services/appointment.service')
 
-class AppointmentController { 
+class AppointmentController {
 
     create = async (req, res, next) => {
         const body = req.body
@@ -38,7 +38,19 @@ class AppointmentController {
         const posters = await AppointmentService.getAllAppointment()
         res.status(200).json(posters).send();
     }
-
+    getAppointmentByUserIdWithPage = async(req, res, next) => {
+        const userId = req.params.userId;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        try {
+            const appointments = await AppointmentService.getAppointmentByUserIdWithPage(userId, page, limit);
+            res.status(200).json(appointments).send();
+        } catch (error) {
+            next(error);
+        }
+    }
+    
+    
 }
 
 module.exports = new AppointmentController()
