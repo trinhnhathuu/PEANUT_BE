@@ -1,13 +1,20 @@
 // khai báo port và khởi động server
 
 const app = require("./src/app");
-// const port = 3039
+const http = require('http');
+const initializeWebSocketServer = require('./src/socket/socket');
 
 const PORT = process.env.PORT || 3039;
 
-const server = app.listen(PORT, () =>{
+// Tạo HTTP server
+const server = http.createServer(app);
+
+// Tích hợp WebSocket server
+initializeWebSocketServer(server);
+
+server.listen(PORT, () => {
     console.log('server is running on port:', PORT);
-})
+});
 
 
 // process.on('SIGINT', ()=>{

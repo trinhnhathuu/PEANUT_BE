@@ -4,8 +4,6 @@ const express = require('express');
 const { default: helmet } = require('helmet');
 const morgan = require('morgan');
 const app = express();
-const transformId = require('./middleware/transformId'); // Đường dẫn đến file middleware bạn vừa tạo
-
 
 // init middleware
 app.use(morgan('dev'));
