@@ -8,5 +8,6 @@ router.get('/poster', asyncHandler(posterController.getPosters))
 router.get('/poster/user/:userId/posts/', asyncHandler(posterController.getPostersByUserIdWithPage))
 router.delete('/poster/:id', asyncHandler(posterController.deletePoster))
 router.put('/poster/:id', asyncHandler(posterController.updatePoster))
+router.get('/poster/byt', asyncHandler(posterController.getPostersByBYT))
 
 module.exports = router

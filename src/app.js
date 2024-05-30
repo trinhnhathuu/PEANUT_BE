@@ -18,6 +18,8 @@ require('./dbs/init.monggodb.lov0')
 // checkOverload()
 // init routes
 app.use('', require('./routes'))
+// cron
+require('./cron/cron');
 //  hading err
 app.use((req, res, next) => {
     const error = new Error('Not found')

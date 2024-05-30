@@ -5,6 +5,8 @@ const router = express.Router();
 // check apiKey
 router.use(apiKey)
 router.use(permission('0000'))
+router.use('/v1/api', require('./pregnancy_guide.router'))
+router.use('/v1/api', require('./pregnancy.router'))
 router.use('/v1/api', require('./comment.router'))
 router.use('/v1/api', require('./appointment.router'))
 router.use('/v1/api', require('./hospital.router'))

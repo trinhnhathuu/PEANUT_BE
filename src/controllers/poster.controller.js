@@ -34,6 +34,10 @@ class PosterController{
         res.status(200).json(poster).send();
     }
 
+    getPostersByBYT = async (req, res, next) => {
+        const posters = await PosterService.getPostersByBYT()
+        res.status(200).json(posters).send();
+    }
 
 }
 module.exports = new PosterController()

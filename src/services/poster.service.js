@@ -8,26 +8,38 @@ class PosterService{
     }
 
     getPosters = async() => {
-        return await poster
-            .find({})
-            .populate('userId', 'name')
-            .sort({ createdAt: -1 })
-            .lean()
-    }
-    getPostersByUserIdWithPage = async(userId, page, limit) => {
-        try {
+      return await poster
+          .find({ type: { $ne: 'boyte' } })
+          .populate('userId', 'name')
+          .sort({ createdAt: -1 })
+          .lean()
+  }
+  getPostersByUserIdWithPage = async(userId, page, limit) => {
+      try {
           const posters = await poster
-            .find({ userId: new ObjectId(userId) })
-            .populate('userId', 'name')
-            .skip((page - 1) * limit)
-            .limit(limit)
-            .lean()
-            .sort({ createdAt: -1 })
+              .find({ 
+                  userId: new ObjectId(userId),
+                  type: { $ne: 'boyte' }
+              })
+              .populate('userId', 'name')
+              .skip((page - 1) * limit)
+              .limit(limit)
+              .sort({ createdAt: -1 })
+              .lean()
           return posters
-        } catch (error) {
+      } catch (error) {
           throw error
-        }
-    }
+      }
+  }
+  getPostersByBYT = async (type) => { 
+    return await poster
+    .find({ type: 'boyte' })
+    .populate('userId', 'name')
+    .sort({ createdAt: -1 })
+    .lean()
+  }
+
+
     update = async (id, body) => {
         return await poster
             .updateOne({ _id: new ObjectId(id) }, { $set: body })
